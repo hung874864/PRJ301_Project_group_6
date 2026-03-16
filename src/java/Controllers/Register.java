@@ -121,7 +121,7 @@ public class Register extends HttpServlet {
             
             
             request.getRequestDispatcher("Views/StudentDashboard.jsp").forward(request, response);
-    }
+    }//
 
     /**
      * Returns a short description of the servlet.
