@@ -1,6 +1,6 @@
 <%-- 
-    Document   : StudentDashboard
-    Created on : Mar 16, 2026, 9:36:56 PM
+    Document   : OwnerDashboard
+    Created on : Mar 16, 2026, 10:14:00 PM
     Author     : LENOVO
 --%>
 
@@ -13,6 +13,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>student dashboard</h1>
+        <h1>owner dashboard</h1>
     </body>
 </html>
