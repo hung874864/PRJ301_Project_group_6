@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 /**
  *
@@ -109,16 +110,33 @@ public class Admin extends HttpServlet {
             String role = request.getParameter("role");
             if (action.equals("Update")) {
                 AccountDAO ad = new AccountDAO();
-                Account a = new Account(username,password,role);
+                Account a = new Account(username, password, role);
                 ad.updateAccount(a);
                 request.setAttribute("accounts", ad.getAccounts());
                 request.getRequestDispatcher("Views/AdminDashboard.jsp").forward(request, response);
             }
             if (action.equals("Create")) {
                 AccountDAO ad = new AccountDAO();
-                Account a = new Account(username,password,role);
+                Account a = new Account(username, password, role);
                 ad.insertAccount(a);
                 request.setAttribute("accounts", ad.getAccounts());
+                request.getRequestDispatcher("Views/AdminDashboard.jsp").forward(request, response);
+            }
+            if (action.equals("Search")) {
+                AccountDAO ad = new AccountDAO();
+                ArrayList<Account> accounts = new ArrayList<>();
+                for (Account a : ad.getAccounts()) {
+                    if (username != null && !username.equals("")) {
+                        if (a.getUsername().contains(username) || a.getRole().equals(role)) {
+                            accounts.add(a);
+                        }
+                    }else{
+                        if (a.getRole().equals(role)) {
+                            accounts.add(a);
+                        }
+                    }
+                }
+                request.setAttribute("accounts", accounts);
                 request.getRequestDispatcher("Views/AdminDashboard.jsp").forward(request, response);
             }
         } else {
