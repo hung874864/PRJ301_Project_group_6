@@ -87,14 +87,18 @@ public class Owner extends HttpServlet {
                 request.getRequestDispatcher("Views/OwnerRoomDetail.jsp").forward(request, response);
             }
             if (action.equals("update")) {
-                BillDAO bd = new BillDAO();
-                request.setAttribute("bills", bd.getBills());
-                request.getRequestDispatcher("Views/OwnerBill.jsp").forward(request, response);
+                RoomDAO rd = new RoomDAO();
+                String roomID = request.getParameter("id");
+                Room r = rd.getRoom(Integer.parseInt(roomID));
+                request.setAttribute("r", r);
+                request.getRequestDispatcher("Views/OwnerUpdateRoom.jsp").forward(request, response);
             }
             if (action.equals("delete")) {
-                BillDAO bd = new BillDAO();
-                request.setAttribute("bills", bd.getBills());
-                request.getRequestDispatcher("Views/OwnerBill.jsp").forward(request, response);
+                RoomDAO rd = new RoomDAO();
+                String roomID = request.getParameter("id");
+                rd.deleteRoom(Integer.parseInt(roomID));
+                request.setAttribute("rooms", rd.getRooms());
+                request.getRequestDispatcher("Views/OwnerDashboard.jsp").forward(request, response);
             }
             if (action.equals("dashboard")) {
                 RoomDAO rd = new RoomDAO();
@@ -169,6 +173,26 @@ public class Owner extends HttpServlet {
                      request.setAttribute("maxStudent", maxStudent);
                      request.setAttribute("error", "Room price is int and max student is double ");
                     request.getRequestDispatcher("Views/OwnerCreateRoom.jsp").forward(request, response);
+                 }
+             }
+             if (action.equals("Update")) {
+                 String roomID = request.getParameter("roomID");
+                 String roomName = request.getParameter("roomName");
+                 String roomPrice = request.getParameter("roomPrice");
+                 try{
+                     double price = Double.parseDouble(roomPrice);
+                     RoomDAO rd = new RoomDAO();
+                     Room r = new Room(Integer.parseInt(roomID),roomName,price,rd.getRoom(Integer.parseInt(roomID)).getMaxStudents(),0);
+                     rd.updateRoom(r);
+                     request.setAttribute("rooms", rd.getRooms());
+                    request.getRequestDispatcher("Views/OwnerDashboard.jsp").forward(request, response);
+                 }catch(Exception exception){
+                     RoomDAO rd = new RoomDAO();
+                     request.setAttribute("roomName", roomName);
+                     request.setAttribute("roomPrice", roomPrice);
+                     request.setAttribute("maxStudent", rd.getRoom(Integer.parseInt(roomID)).getMaxStudents());
+                     request.setAttribute("error", "Room price is int and max student is double ");
+                    request.getRequestDispatcher("Views/OwnerUpdateRoom.jsp").forward(request, response);
                  }
              }
         } else {

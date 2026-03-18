@@ -1,6 +1,6 @@
 <%-- 
-    Document   : OwnerCreateRoom
-    Created on : Mar 17, 2026, 8:22:09 PM
+    Document   : OwnerUpdateRoom
+    Created on : Mar 18, 2026, 7:11:21 PM
     Author     : LENOVO
 --%>
 
@@ -13,23 +13,23 @@
     </head>
     <body>
         <a href="${pageContext.request.contextPath}/Owner?action=dashboard">go back</a>
-        <h1>Owner Create Room</h1>
+        <h1>Owner Update Room at ID: ${r.roomID}</h1>
         <form action="${pageContext.request.contextPath}/Owner" method="post">
             <table>
                 <tr>
+                    <td>Room ID: </td>
+                    <td><input type="text" name="roomID" value="${r.roomID}" readonly></td>
+                </tr>
+                <tr>
                     <td>Room Name: </td>
-                    <td><input type="text" name="roomName" value="${roomName}"></td>
+                    <td><input type="text" name="roomName" value="${r.roomName}"></td>
                 </tr>
                 <tr>
                     <td>Room Price: </td>
-                    <td><input type="text" name="roomPrice" value="${roomPrice}"></td>
+                    <td><input type="text" name="roomPrice" value="${r.price}"></td>
                 </tr>
                 <tr>
-                    <td>Max student: </td>
-                    <td><input type="text" name="maxStudent" value="${maxStudent}"></td>
-                </tr>
-                <tr>
-                    <td><input type="submit" name="action" value="Create"></td>
+                    <td><input type="submit" name="action" value="Update"></td>
                 </tr>
                 <tr>
                     <td>${error}</td>
