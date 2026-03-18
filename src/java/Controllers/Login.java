@@ -105,6 +105,8 @@ public class Login extends HttpServlet {
                     request.getRequestDispatcher("Views/AdminDashboard.jsp").forward(request, response);
                     break;
                 case "owner":
+                    RoomDAO rd = new RoomDAO();
+                    request.setAttribute("rooms", rd.getRooms());
                     request.getRequestDispatcher("Views/OwnerDashboard.jsp").forward(request, response);
                     break;
                 case "student":
@@ -114,7 +116,7 @@ public class Login extends HttpServlet {
                     ContractDAO cd = new ContractDAO();
                     Contract con = cd.getContract(username);
 
-                    RoomDAO rd = new RoomDAO();
+                    rd = new RoomDAO();
                     Room room = rd.getRoom(con.getRoomID());
 
 //                    BillDAO bd = new BillDAO();

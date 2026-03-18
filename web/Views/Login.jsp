@@ -42,7 +42,7 @@
 
 <p>
     Don't have an account? 
-    <a href="register">Register here</a>
+    <a href="Register.jsp">Register here</a>
 </p>
 
 </body>

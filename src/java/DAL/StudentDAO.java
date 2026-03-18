@@ -39,6 +39,33 @@ public class StudentDAO extends DBContext {
             return null;
         }
     }
+    
+    public ArrayList<Student> getStudentsByRoom(int roomID) {
+        ArrayList<Student> students = new ArrayList<>();
+        try {
+            String sql = "SELECT s.* FROM Students s JOIN Contracts c ON s.Username = c.StudentUsername WHERE c.RoomID = ?;";
+            st = connection.prepareStatement(sql);
+            st.setInt(1, roomID);
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+
+                String username = rs.getString("Username");
+                String name = rs.getString("FullName");
+                Date birth = rs.getDate("BirthDate");
+                String gender = rs.getString("Gender");
+                String phone = rs.getString("Phone");
+
+                students.add(new Student(username, name, birth, gender, phone));
+            }
+
+            return students;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public Student getStudent(String username) {
         try {

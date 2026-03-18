@@ -15,6 +15,7 @@
     <body>
         <h1>Home: Student Dorm management</h1>
         <h1>Available rooms</h1>
+        <a href='Views/Login.jsp'>Login</a><a href='Views/Register.jsp'>Register</a>
         <table border="1">
             <tr>
                 <th>Room Name</th>
