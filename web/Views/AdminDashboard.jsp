@@ -13,6 +13,7 @@
         <title>JSP Page</title>
     </head>
     <body>
+        <a href="Logout">Log Out</a>
         <h1>admin dashboard</h1>
         <a href="Views/AdminCreateAccount.jsp">Create Account</a>
         <form action='${pageContext.request.contextPath}/Admin' method='post'>

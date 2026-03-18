@@ -14,7 +14,8 @@
     </head>
     <body>
         <h1>owner dashboard</h1>
-        <a href="Owner?action=contract">Contracts</a><a href="Owner?action=bill">Bills</a>
+        <a href="Owner?action=contract">Contracts</a><a href="Owner?action=bill">Bills</a><a href="Logout">Log Out</a>
+        <br>
             <a href="Views/OwnerCreateRoom.jsp">Create Room</a>
             <form action="${pageContext.request.contextPath}/Owner" method="post">
                 <tr>Room ID: <input type="text" name="roomSearch" value="${roomSearch}"></tr>

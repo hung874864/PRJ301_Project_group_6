@@ -5,12 +5,17 @@
 
 package Controllers;
 
+import DAL.RoomDAO;
+import Models.Account;
+import Models.Room;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 /**
  *
@@ -53,7 +58,16 @@ public class Logout extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+          HttpSession session = request.getSession(false);
+
+    if (session != null) {
+        session.invalidate();
+    }
+
+    RoomDAO rd = new RoomDAO();
+        ArrayList<Room> rooms = rd.getRooms();
+        request.setAttribute("rooms", rooms);
+        request.getRequestDispatcher("Home.jsp").forward(request, response);
     } 
 
     /** 
