@@ -327,7 +327,7 @@ public class Owner extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet Admin</title>");
+            out.println("<title>Servlet Owner</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("no permission to enter");
