@@ -13,7 +13,7 @@
     </head>
     <body>
         <a href="${pageContext.request.contextPath}/Owner?action=bill">go back</a>
-        <h1>Hello World!</h1>
+        <h1>Owner create bill</h1>
         <form action="${pageContext.request.contextPath}/Owner" method="post">
     <table>
         <tr>

@@ -21,7 +21,7 @@
             <input type="submit" name="action" value="Search Contract">
         </form>
             <br><!-- comment -->
-            <a href="Views/OwnerCreateContract">Create Contract</a>
+            <a href="Views/OwnerCreateContract.jsp">Create Contract</a>
         
         <h1>Contract List</h1>
 

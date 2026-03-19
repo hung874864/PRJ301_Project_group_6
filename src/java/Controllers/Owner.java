@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.sql.Date;
 
 /**
  *
@@ -238,7 +239,7 @@ public class Owner extends HttpServlet {
                     request.getRequestDispatcher("Views/OwnerBill.jsp").forward(request, response);
                 }
             }
-            
+
             //search for contract by student username
             if (action.equals("Search Contract")) {
                 String contractSearch = request.getParameter("contractSearch");
@@ -251,7 +252,7 @@ public class Owner extends HttpServlet {
                 request.getRequestDispatcher("Views/OwnerContract.jsp").forward(request, response);
 
             }
-            
+
             //create new bill
             if (action.equals("Create Bill")) {
                 int roomID = Integer.parseInt(request.getParameter("roomID"));
@@ -265,6 +266,61 @@ public class Owner extends HttpServlet {
                 bd.insertBill(b);
                 request.setAttribute("bills", bd.getBills());
                 request.getRequestDispatcher("Views/OwnerBill.jsp").forward(request, response);
+            }
+
+            //create new contract
+            if (action.equals("Create Contract")) {
+                String studentUsername = request.getParameter("studentUsername");
+                int roomID = Integer.parseInt(request.getParameter("roomID"));
+                Date startDate = java.sql.Date.valueOf(request.getParameter("startDate"));
+                Date endDate = java.sql.Date.valueOf(request.getParameter("endDate"));
+
+                StudentDAO sd = new StudentDAO();
+                RoomDAO rd = new RoomDAO();
+                ContractDAO cd = new ContractDAO();
+                Room r = rd.getRoom(roomID);
+                //if student username no valid
+                if (sd.getStudent(studentUsername) == null) {
+                    request.setAttribute("error", "no student found");
+                    request.setAttribute("studentUsername", studentUsername);
+                    request.setAttribute("roomID", roomID);
+                    request.setAttribute("startDate", startDate);
+                    request.setAttribute("endDate", endDate);
+                    request.getRequestDispatcher("Views/OwnerCreateContract.jsp").forward(request, response);
+                    return;
+                } else if (r == null) {// room no valid
+                    request.setAttribute("error", "no room found");
+                    request.setAttribute("studentUsername", studentUsername);
+                    request.setAttribute("roomID", roomID);
+                    request.setAttribute("startDate", startDate);
+                    request.setAttribute("endDate", endDate);
+                    request.getRequestDispatcher("Views/OwnerCreateContract.jsp").forward(request, response);
+                    return;
+                } else if (r.getStatus() >= r.getMaxStudents()) {//room full
+                    request.setAttribute("error", " room full");
+                    request.setAttribute("studentUsername", studentUsername);
+                    request.setAttribute("roomID", roomID);
+                    request.setAttribute("startDate", startDate);
+                    request.setAttribute("endDate", endDate);
+                    request.getRequestDispatcher("Views/OwnerCreateContract.jsp").forward(request, response);
+                    return;
+                } else if (cd.getContract(studentUsername) != null) { //contract already exist
+                    request.setAttribute("error", "this student already signed a contract ");
+                    request.setAttribute("studentUsername", studentUsername);
+                    request.setAttribute("roomID", roomID);
+                    request.setAttribute("startDate", startDate);
+                    request.setAttribute("endDate", endDate);
+                    request.getRequestDispatcher("Views/OwnerCreateContract.jsp").forward(request, response);
+                    return;
+                }
+
+                //found student, found room all valid
+                cd.insertContract(new Contract(0, studentUsername, roomID, startDate, endDate));
+                
+                r.setStatus(r.getStatus() + 1);
+                rd.updateRoom(r);
+                request.setAttribute("contracts", cd.getContracts());
+                request.getRequestDispatcher("Views/OwnerContract.jsp").forward(request, response);
             }
         } else {
             PrintWriter out = response.getWriter();
