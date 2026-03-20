@@ -1,81 +1,116 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package Controllers;
 
+import DAL.BillDAO;
+import DAL.ContractDAO;
+import DAL.RoomDAO;
+import DAL.StudentDAO;
+import Models.Account;
+import Models.Bill;
+import Models.Contract;
+import Models.Room;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-/**
- *
- * @author LENOVO
- */
 public class Student extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet Student</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet Student at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // Lấy dữ liệu hiển thị lên Dashboard
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
-    } 
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        Account acc = (Account) session.getAttribute("account");
+        
+        if (acc == null) {
+            response.sendRedirect("Login");
+            return;
+        }
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            String username = acc.getUsername();
+            
+            // 1. Lấy thông tin Student bằng hàm getStudent() trong DAO của bạn
+            StudentDAO sd = new StudentDAO();
+            Models.Student student = sd.getStudent(username); 
+            
+            // 2. Lấy Hợp đồng (Contract)
+            ContractDAO cd = new ContractDAO();
+            Contract con = cd.getContract(username);
+            
+            Room room = null;
+            Bill bill = null; 
+            
+            // 3. Nếu có hợp đồng thì lấy Phòng và Hóa đơn
+            if (con != null) {
+                RoomDAO rd = new RoomDAO();
+                room = rd.getRoom(con.getRoomID());
+                
+                if (room != null) {
+                    BillDAO bd = new BillDAO();
+                    // Gọi hàm getBill() GỐC của bạn
+                    bill = bd.getBill(room.getRoomID()); 
+                }
+            }
+            
+            // 4. Đẩy sang JSP
+            request.setAttribute("student", student);
+            request.setAttribute("room", room);
+            request.setAttribute("bill", bill); 
+            
+            request.getRequestDispatcher("Views/StudentDashboard.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Lỗi hệ thống: " + e.getMessage());
+        }
     }
 
-    /** 
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
+    // Xử lý Cập nhật Profile
     @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
+        try {
+            // Lấy dữ liệu từ form
+            String username = request.getParameter("username");
+            String fullName = request.getParameter("fullName");
+            String dobString = request.getParameter("birthDate");
+            String gender = request.getParameter("gender");
+            String phone = request.getParameter("phone");
+            
+            java.sql.Date birthDate = null;
+            if (dobString != null && !dobString.isEmpty()) {
+                birthDate = java.sql.Date.valueOf(dobString);
+            }
 
+            // Tạo object Student mới
+            Models.Student s = new Models.Student(username, fullName, birthDate, gender, phone);
+
+            // Gọi DAO để update
+            StudentDAO sd = new StudentDAO();
+            
+            // GỌI ĐÚNG HÀM updateStudent() TRONG FILE DAO CỦA BẠN
+            sd.updateStudent(s); 
+            
+            // Vì hàm updateStudent là kiểu void, nếu chạy qua dòng trên mà không sinh ra lỗi (Exception)
+            // thì nghĩa là update thành công, ta báo thành công luôn.
+            request.setAttribute("message", "Cập nhật thông tin thành công!");
+            
+            // Load lại trang với dữ liệu mới
+            doGet(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Nếu có lỗi SQL hoặc lỗi ép kiểu ngày tháng, nó sẽ nhảy xuống đây
+            request.setAttribute("error", "Lỗi cập nhật: " + e.getMessage());
+            doGet(request, response);
+        }
+    }
 }

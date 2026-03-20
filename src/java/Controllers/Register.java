@@ -93,10 +93,10 @@ public class Register extends HttpServlet {
 
         if (ad.getAccount(username) != null) {
             request.setAttribute("error", "Username already exists!");
-            request.getRequestDispatcher("Register.jsp").forward(request, response);
+            request.getRequestDispatcher("/Views/Register.jsp").forward(request, response);
             return;
         }
-        
+
         java.sql.Date date = java.sql.Date.valueOf(birthdate);
 
         Account acc = new Account(username, password, "student");
@@ -105,22 +105,30 @@ public class Register extends HttpServlet {
         ad.insertAccount(acc);
         sd.insertStudent(stu);
 
-         HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
 
-            // store account in session
-            session.setAttribute("account", acc);
-            
-            ContractDAO cd = new ContractDAO();
-            Contract con = cd.getContract(username);
-            
+        // store account in session
+        session.setAttribute("account", acc);
+        request.setAttribute("student", stu);
+        ContractDAO cd = new ContractDAO();
+        Contract con = cd.getContract(username);
+
+        if (con != null) {
             RoomDAO rd = new RoomDAO();
             Room room = rd.getRoom(con.getRoomID());
-            
-            BillDAO bd = new BillDAO();
-            Bill bill = bd.getBill(room.getRoomID());
-            
-            
-            request.getRequestDispatcher("Views/StudentDashboard.jsp").forward(request, response);
+
+            if (room != null) {
+                BillDAO bd = new BillDAO();
+                Bill bill = bd.getBill(room.getRoomID());
+
+                // Đẩy thông tin vào request nếu cần dùng ở Dashboard
+                request.setAttribute("contract", con);
+                request.setAttribute("room", room);
+                request.setAttribute("bill", bill);
+            }
+        }
+
+        request.getRequestDispatcher("Views/StudentDashboard.jsp").forward(request, response);
     }//
 
     /**

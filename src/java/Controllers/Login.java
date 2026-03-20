@@ -93,7 +93,7 @@ public class Login extends HttpServlet {
                 request.getRequestDispatcher("Views/Login.jsp").forward(request, response);
                 return;
             }
-            
+
             //save account login
             HttpSession session = request.getSession();
             session.setAttribute("account", acc);
@@ -110,30 +110,37 @@ public class Login extends HttpServlet {
                     request.getRequestDispatcher("Views/OwnerDashboard.jsp").forward(request, response);
                     break;
                 case "student":
+
                     StudentDAO sd = new StudentDAO();
                     Student student = sd.getStudent(username);
+                    request.setAttribute("student", student);
 
                     ContractDAO cd = new ContractDAO();
                     Contract con = cd.getContract(username);
 
-                    rd = new RoomDAO();
-                    Room room = rd.getRoom(con.getRoomID());
+                    //rd = new RoomDAO();
+                    if (con != null) {
+                        rd = new RoomDAO();
+                        Room room = rd.getRoom(con.getRoomID());
+                        request.setAttribute("room", room);
 
-//                    BillDAO bd = new BillDAO();
-//                    Bill bill = bd.getBill(room.getRoomID());
-
-                    request.setAttribute("student", student);
-                    request.setAttribute("room", room);
+                        // 3. Nếu đã có phòng thì mới đi tìm Hóa đơn (Bill)
+                        if (room != null) {
+                            BillDAO bd = new BillDAO();
+                            Bill bill = bd.getBill(room.getRoomID());
+                            request.setAttribute("bill", bill);
+                        }
+                    }
 
                     request.getRequestDispatcher("Views/StudentDashboard.jsp").forward(request, response);
                     break;
                 default:
-                    System.out.println("no role available");
+                    System.out.println("No role available");
                     break;
             }
 
         } else {
-            request.setAttribute("error", "account no exist");
+            request.setAttribute("error", "Account no exist");
             request.getRequestDispatcher("Views/Login.jsp").forward(request, response);
 
         }
